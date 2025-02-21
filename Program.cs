@@ -33,4 +33,23 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+// GET Campsites
+app.MapGet("/api/campsites", (CreekRiverDbContext db) =>
+{
+    return db.Campsites.ToList();
+});
+
+// GET Campsite by ID
+app.MapGet("/api/campsites/{id}", (CreekRiverDbContext db, int id) =>
+{
+    try
+    {
+        return Results.Ok(db.Campsites.Include(c => c.CampsiteType).Single(c => c.Id == id));
+    }
+    catch
+    {
+        return Results.NotFound();
+    }
+});
+
 app.Run();

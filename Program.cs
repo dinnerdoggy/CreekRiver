@@ -101,4 +101,32 @@ app.MapGet("/api/reservations", (CreekRiverDbContext db) =>
         .ToList();
 });
 
+// CREATE Reservation
+app.MapPost("/api/reservations", (CreekRiverDbContext db, Reservation newRes) =>
+{
+    try
+    {
+        db.Reservations.Add(newRes);
+        db.SaveChanges();
+        return Results.Created($"/api/reservations/{newRes.Id}", newRes);
+    }
+    catch (DbUpdateException)
+    {
+        return Results.BadRequest("Invalid data submitted");
+    }
+});
+
+// DELETE Reservation
+app.MapDelete("/api/reservations{id}", (CreekRiverDbContext db, int id) =>
+{
+    Reservation reservation = db.Reservations.SingleOrDefault(r => r.Id == id);
+    if (reservation == null)
+    {
+        return Results.NotFound();
+    }
+    db.Reservations.Remove(reservation);
+    db.SaveChanges();
+    return Results.NoContent();
+});
+
 app.Run();
